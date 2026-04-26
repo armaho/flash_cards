@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -32,7 +33,8 @@ func checkConfig(cfg, expected *config.Config, t *testing.T) {
 
 	if (cfg == nil) || (expected == nil) ||
 		(cfg.IncreaseFactor != expected.IncreaseFactor) ||
-		(cfg.DecreaseFactor != expected.DecreaseFactor) {
+		(cfg.DecreaseFactor != expected.DecreaseFactor) ||
+		(cfg.InitialInterval != expected.InitialInterval) {
 		t.Errorf("expected config %#v, got %#v", expected, cfg)
 	}
 }
@@ -50,8 +52,9 @@ func TestSaveShouldReturnAnErrorIfConfigPathHasNotBeenSet(t *testing.T) {
 	t.Setenv("CONFIG_PATH", "")
 
 	err := config.Save(&config.Config{
-		DecreaseFactor: 0.5,
-		IncreaseFactor: 2,
+		DecreaseFactor:  0.5,
+		IncreaseFactor:  2,
+		InitialInterval: 24,
 	})
 	if err == nil {
 		t.Error("Expected config.Save to return an error if CONFIG_PATH hasn't been set")
@@ -65,17 +68,24 @@ func TestSaveShouldCreateANewFileIfConfigDoesNotExist(t *testing.T) {
 
 	t.Setenv("CONFIG_PATH", configPath)
 
-	err := config.Save(&config.Config{
-		DecreaseFactor: 0.5,
-		IncreaseFactor: 2,
-	})
+	cfg := config.Config{
+		DecreaseFactor:  0.5,
+		IncreaseFactor:  2,
+		InitialInterval: 25,
+	}
+
+	err := config.Save(&cfg)
 	if err != nil {
 		t.Errorf("config.Save throw an error: %s", err)
-		return
 	}
 
 	checkFileExistance(configPath, t)
-	checkFileContent(configPath, `{"increase_factor":2,"decrease_factor":0.5}`, t)
+
+	data, err := json.Marshal(cfg)
+	if err != nil {
+		t.Errorf("json.Marshal error: %s", err)
+	}
+	checkFileContent(configPath, string(data), t)
 }
 
 func TestLoadShouldCreateANewFileIfConfigDoesNotExist(t *testing.T) {
@@ -92,8 +102,8 @@ func TestLoadShouldCreateANewFileIfConfigDoesNotExist(t *testing.T) {
 	}
 
 	checkFileExistance(configPath, t)
-	checkFileContent(configPath, `{"increase_factor":2,"decrease_factor":0.5}`, t)
-	checkConfig(cfg, &config.Config{DecreaseFactor: 0.5, IncreaseFactor: 2}, t)
+	checkFileContent(configPath, `{"increase_factor":2,"decrease_factor":0.5,"initial_interval":24}`, t)
+	checkConfig(cfg, &config.Config{DecreaseFactor: 0.5, IncreaseFactor: 2, InitialInterval: 24}, t)
 }
 
 func TestLoadShouldReadCorrectly(t *testing.T) {
@@ -104,8 +114,9 @@ func TestLoadShouldReadCorrectly(t *testing.T) {
 	t.Setenv("CONFIG_PATH", configPath)
 
 	expected_config := &config.Config{
-		DecreaseFactor: 0.9,
-		IncreaseFactor: 1.1,
+		DecreaseFactor:  0.9,
+		IncreaseFactor:  1.1,
+		InitialInterval: 27,
 	}
 
 	err := config.Save(expected_config)

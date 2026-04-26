@@ -8,8 +8,17 @@ import (
 )
 
 type Config struct {
-	IncreaseFactor float64 `json:"increase_factor"`
-	DecreaseFactor float64 `json:"decrease_factor"`
+	IncreaseFactor  float64 `json:"increase_factor"`
+	DecreaseFactor  float64 `json:"decrease_factor"`
+	InitialInterval int     `json:"initial_interval"`
+}
+
+func getDefaultConfig() Config {
+	return Config{
+		IncreaseFactor:  2,
+		DecreaseFactor:  0.5,
+		InitialInterval: 24,
+	}
 }
 
 func Load() (*Config, error) {
@@ -26,8 +35,7 @@ func Load() (*Config, error) {
 			return nil, err
 		}
 
-		cfg.IncreaseFactor = 2
-		cfg.DecreaseFactor = 0.5
+		cfg = getDefaultConfig()
 
 		err = Save(&cfg)
 		if err != nil {
