@@ -103,7 +103,11 @@ func TestLoadShouldCreateANewFileIfConfigDoesNotExist(t *testing.T) {
 
 	checkFileExistance(configPath, t)
 	checkFileContent(configPath, `{"increase_factor":2,"decrease_factor":0.5,"initial_interval":24}`, t)
-	checkConfig(cfg, &config.Config{DecreaseFactor: 0.5, IncreaseFactor: 2, InitialInterval: 24}, t)
+	checkConfig(cfg, &config.Config{
+		DecreaseFactor:  0.5,
+		IncreaseFactor:  2,
+		InitialInterval: 24,
+	}, t)
 }
 
 func TestLoadShouldReadCorrectly(t *testing.T) {
