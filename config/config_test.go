@@ -31,10 +31,19 @@ func checkConfig(cfg, expected *config.Config, t *testing.T) {
 		return
 	}
 
-	if (cfg == nil) || (expected == nil) ||
-		(cfg.IncreaseFactor != expected.IncreaseFactor) ||
-		(cfg.DecreaseFactor != expected.DecreaseFactor) ||
-		(cfg.InitialInterval != expected.InitialInterval) {
+	if (cfg == nil) || (expected == nil) {
+		t.Errorf("expected config %#v, got %#v", expected, cfg)
+	}
+
+	cfgData, err := json.Marshal(cfg)
+	if err != nil {
+		t.Errorf("json.Marshal error: %s", err)
+	}
+	expectedData, err := json.Marshal(expected)
+	if err != nil {
+		t.Errorf("json.Marshal error: %s", err)
+	}
+	if string(cfgData) != string(expectedData) {
 		t.Errorf("expected config %#v, got %#v", expected, cfg)
 	}
 }

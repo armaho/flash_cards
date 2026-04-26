@@ -11,6 +11,7 @@ type Config struct {
 	IncreaseFactor  float64 `json:"increase_factor"`
 	DecreaseFactor  float64 `json:"decrease_factor"`
 	InitialInterval int     `json:"initial_interval"`
+	DataPath        string  `json:"data_path"`
 }
 
 func GetDefaultConfig() Config {
@@ -18,6 +19,7 @@ func GetDefaultConfig() Config {
 		IncreaseFactor:  2,
 		DecreaseFactor:  0.5,
 		InitialInterval: 24,
+		DataPath:        "./flash-cards-data",
 	}
 }
 
@@ -51,6 +53,15 @@ func Load() (*Config, error) {
 	}
 
 	return &cfg, err
+}
+
+func LoadOrDie() *Config {
+	cfg, err := Load()
+	if err != nil {
+		panic(err)
+	}
+
+	return cfg
 }
 
 func Save(cfg *Config) error {
