@@ -13,7 +13,7 @@ type Config struct {
 	InitialInterval int     `json:"initial_interval"`
 }
 
-func getDefaultConfig() Config {
+func GetDefaultConfig() Config {
 	return Config{
 		IncreaseFactor:  2,
 		DecreaseFactor:  0.5,
@@ -35,7 +35,7 @@ func Load() (*Config, error) {
 			return nil, err
 		}
 
-		cfg = getDefaultConfig()
+		cfg = GetDefaultConfig()
 
 		err = Save(&cfg)
 		if err != nil {

@@ -51,11 +51,8 @@ func TestSaveShouldReturnAnErrorForNilConfig(t *testing.T) {
 func TestSaveShouldReturnAnErrorIfConfigPathHasNotBeenSet(t *testing.T) {
 	t.Setenv("CONFIG_PATH", "")
 
-	err := config.Save(&config.Config{
-		DecreaseFactor:  0.5,
-		IncreaseFactor:  2,
-		InitialInterval: 24,
-	})
+	cfg := config.GetDefaultConfig()
+	err := config.Save(&cfg)
 	if err == nil {
 		t.Error("Expected config.Save to return an error if CONFIG_PATH hasn't been set")
 	}
@@ -68,12 +65,7 @@ func TestSaveShouldCreateANewFileIfConfigDoesNotExist(t *testing.T) {
 
 	t.Setenv("CONFIG_PATH", configPath)
 
-	cfg := config.Config{
-		DecreaseFactor:  0.5,
-		IncreaseFactor:  2,
-		InitialInterval: 25,
-	}
-
+	cfg := config.GetDefaultConfig()
 	err := config.Save(&cfg)
 	if err != nil {
 		t.Errorf("config.Save throw an error: %s", err)
@@ -101,13 +93,15 @@ func TestLoadShouldCreateANewFileIfConfigDoesNotExist(t *testing.T) {
 		return
 	}
 
+	defaultCfg := config.GetDefaultConfig()
+	data, err := json.Marshal(config.GetDefaultConfig())
+	if err != nil {
+		t.Errorf("json.Marshal error: %s", err)
+	}
+
 	checkFileExistance(configPath, t)
-	checkFileContent(configPath, `{"increase_factor":2,"decrease_factor":0.5,"initial_interval":24}`, t)
-	checkConfig(cfg, &config.Config{
-		DecreaseFactor:  0.5,
-		IncreaseFactor:  2,
-		InitialInterval: 24,
-	}, t)
+	checkFileContent(configPath, string(data), t)
+	checkConfig(cfg, &defaultCfg, t)
 }
 
 func TestLoadShouldReadCorrectly(t *testing.T) {
