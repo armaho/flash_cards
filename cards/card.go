@@ -69,6 +69,10 @@ func (c *Card) Upgrade() {
 }
 
 func (c *Card) Downgrade() {
+	if c.Interval == 0 {
+		c.LastAsked = nil
+	}
+
 	cfg := config.LoadOrDie()
 	c.Interval = int(math.Floor(float64(c.Interval)) * cfg.DecreaseFactor)
 }
