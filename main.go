@@ -9,28 +9,26 @@ import (
 	"github.com/armaho/flash_cards/cards"
 )
 
+func readNonEmptyInput(prompt string) string {
+	reader := bufio.NewReader(os.Stdin)
+	var input string
+
+	for input == "" {
+		fmt.Print(prompt)
+		input, _ = reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+
+		if input == "" {
+			fmt.Println("input cannot be empty")
+		}
+	}
+
+	return input
+}
+
 func addNewCard() {
-	var q, a string
-
-	for q == "" {
-		fmt.Print("question: ")
-		fmt.Scan(&q)
-		q = strings.TrimSpace(q)
-
-		if q == "" {
-			fmt.Println("enter the question")
-		}
-	}
-
-	for a == "" {
-		fmt.Print("answer: ")
-		fmt.Scan(&a)
-		a = strings.TrimSpace(a)
-
-		if a == "" {
-			fmt.Println("enter the answer")
-		}
-	}
+	q := readNonEmptyInput("question: ")
+	a := readNonEmptyInput("answer: ")
 
 	c := cards.NewCard(q, a)
 	err := cards.SaveCard(c)
@@ -39,7 +37,28 @@ func addNewCard() {
 		os.Exit(1)
 	}
 
-	fmt.Printf("successfuly saved. id: %s\n", c.Id)
+	fmt.Printf("successfully saved. id: %s\n", c.Id)
+}
+
+func addVocabCard() {
+	word := readNonEmptyInput("word: ")
+	def := readNonEmptyInput("definition: ")
+	example := readNonEmptyInput("example: ")
+
+	cardList := []*cards.Card{
+		cards.NewCard(fmt.Sprintf("What's the meaning of \"%s\"?", word), def),
+		cards.NewCard(fmt.Sprintf("Use \"%s\" in a sentence", word), example),
+		cards.NewCard(fmt.Sprintf("Say \"%s\" out loud", word), word),
+	}
+
+	for _, c := range cardList {
+		if err := cards.SaveCard(c); err != nil {
+			fmt.Printf("cannot save card: %s\n", err)
+			os.Exit(1)
+		}
+	}
+
+	fmt.Println("successfully saved all cards")
 }
 
 func askCard() {
@@ -93,75 +112,6 @@ func askCard() {
 	}
 }
 
-func addVocabCard() {
-	reader := bufio.NewReader(os.Stdin)
-	var word, def, example string
-
-	for word == "" {
-		fmt.Print("word: ")
-		word, _ = reader.ReadString('\n')
-		word = strings.TrimSpace(word)
-
-		if word == "" {
-			fmt.Println("enter the word")
-		}
-	}
-
-	for def == "" {
-		fmt.Print("definition: ")
-		def, _ = reader.ReadString('\n')
-		def = strings.TrimSpace(def)
-
-		if def == "" {
-			fmt.Println("enter the definition")
-		}
-	}
-
-	for example == "" {
-		fmt.Print("example: ")
-		example, _ = reader.ReadString('\n')
-		example = strings.TrimSpace(example)
-
-		if example == "" {
-			fmt.Println("enter the example")
-		}
-	}
-
-	fmt.Printf("word: %s\n", word)
-	fmt.Printf("def: %s\n", def)
-	fmt.Printf("example: %s\n", example)
-
-	var q, a string
-
-	q = fmt.Sprintf("What's the meaning of \"%s\"?", word)
-	a = def
-	c := cards.NewCard(q, a)
-	err := cards.SaveCard(c)
-	if err != nil {
-		fmt.Printf("cannot save card: %s\n", err)
-		os.Exit(1)
-	}
-
-	q = fmt.Sprintf("Use \"%s\" in a sentence", word)
-	a = example
-	c = cards.NewCard(q, a)
-	err = cards.SaveCard(c)
-	if err != nil {
-		fmt.Printf("cannot save card: %s\n", err)
-		os.Exit(1)
-	}
-
-	q = fmt.Sprintf("Say \"%s\" out loud", word)
-	a = word
-	c = cards.NewCard(q, a)
-	err = cards.SaveCard(c)
-	if err != nil {
-		fmt.Printf("cannot save card: %s\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Println("successfully saved all cards")
-}
 func main() {
 	if len(os.Args) == 1 || os.Args[1] == "help" {
 		fmt.Println("usage: cards [command]")
