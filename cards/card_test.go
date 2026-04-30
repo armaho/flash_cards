@@ -59,7 +59,7 @@ func TestMain(m *testing.M) {
 	}
 	configPath := filepath.Join(tempDir, "test_config.json")
 
-	os.Setenv("CONFIG_PATH", configPath)
+	os.Setenv("CARDS_CONFIG_PATH", configPath)
 
 	cfg := config.GetDefaultConfig()
 	cfg.InitialInterval = 1

@@ -49,7 +49,7 @@ func checkConfig(cfg, expected *config.Config, t *testing.T) {
 }
 
 func TestSaveShouldReturnAnErrorForNilConfig(t *testing.T) {
-	t.Setenv("CONFIG_PATH", filepath.Join(".", "config.json"))
+	t.Setenv("CARDS_CONFIG_PATH", filepath.Join(".", "config.json"))
 
 	err := config.Save(nil)
 	if err == nil {
@@ -58,12 +58,12 @@ func TestSaveShouldReturnAnErrorForNilConfig(t *testing.T) {
 }
 
 func TestSaveShouldReturnAnErrorIfConfigPathHasNotBeenSet(t *testing.T) {
-	t.Setenv("CONFIG_PATH", "")
+	t.Setenv("CARDS_CONFIG_PATH", "")
 
 	cfg := config.GetDefaultConfig()
 	err := config.Save(&cfg)
 	if err == nil {
-		t.Error("Expected config.Save to return an error if CONFIG_PATH hasn't been set")
+		t.Error("Expected config.Save to return an error if CARDS_CONFIG_PATH hasn't been set")
 	}
 }
 
@@ -72,7 +72,7 @@ func TestSaveShouldCreateANewFileIfConfigDoesNotExist(t *testing.T) {
 		"ThisDirDoesNotExist",
 		"ThisFileDoesNotExist.json")
 
-	t.Setenv("CONFIG_PATH", configPath)
+	t.Setenv("CARDS_CONFIG_PATH", configPath)
 
 	cfg := config.GetDefaultConfig()
 	err := config.Save(&cfg)
@@ -94,7 +94,7 @@ func TestLoadShouldCreateANewFileIfConfigDoesNotExist(t *testing.T) {
 		"ThisDirDoesNotExist",
 		"ThisFileDoesNotExist.json")
 
-	t.Setenv("CONFIG_PATH", configPath)
+	t.Setenv("CARDS_CONFIG_PATH", configPath)
 
 	cfg, err := config.Load()
 	if err != nil {
@@ -118,7 +118,7 @@ func TestLoadShouldReadCorrectly(t *testing.T) {
 		"ThisDirDoesNotExist",
 		"ThisFileDoesNotExist.json")
 
-	t.Setenv("CONFIG_PATH", configPath)
+	t.Setenv("CARDS_CONFIG_PATH", configPath)
 
 	expected_config := &config.Config{
 		DecreaseFactor:  0.9,

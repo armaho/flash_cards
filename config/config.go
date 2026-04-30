@@ -24,9 +24,9 @@ func GetDefaultConfig() Config {
 }
 
 func Load() (*Config, error) {
-	path := os.Getenv("CONFIG_PATH")
+	path := os.Getenv("CARDS_CONFIG_PATH")
 	if path == "" {
-		return nil, errors.New("CONFIG_PATH is not provided")
+		return nil, errors.New("CARDS_CONFIG_PATH is not provided")
 	}
 
 	cfg := Config{}
@@ -69,9 +69,9 @@ func Save(cfg *Config) error {
 		return errors.New("Cannot save null as config")
 	}
 
-	path := os.Getenv("CONFIG_PATH")
+	path := os.Getenv("CARDS_CONFIG_PATH")
 	if path == "" {
-		return errors.New("CONFIG_PATH is not provided")
+		return errors.New("CARDS_CONFIG_PATH is not provided")
 	}
 
 	data, err := json.Marshal(cfg)
